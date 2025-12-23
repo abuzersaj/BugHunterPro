@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Bug Hunter - Ultimate Security Scanner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .gradient-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .circle-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            top: -200px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .circle-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--secondary);
+            bottom: -150px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        .circle-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            top: 50%;
+            left: 70%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Main Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .nav-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.9rem 1rem;
+            color: var(--light);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--glass-border);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Stats Card */
+        .stats-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: var(--light);
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .critical { color: var(--danger); }
+        .high { color: var(--warning); }
+        .medium { color: #fbbf24; }
+        .low { color: var(--success); }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Scanner Card */
+        .scanner-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .scanner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .scanner-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .scanner-subtitle {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--light);
+            font-weight: 500;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        /* Scan Types */
+        .scan-types {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+
+        .scan-type {
+            flex: 1;
+            min-width: 150px;
+            padding: 1.5rem;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .scan-type:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .scan-type.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        .scan-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .scan-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .scan-desc {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        /* Progress */
+        .progress-section {
+            margin-top: 2rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .results-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .results-count {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .count-badge {
+            padding: 0.5rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Findings Grid */
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .finding-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .finding-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .finding-card.critical {
+            border-left: 4px solid var(--danger);
+        }
+
+        .finding-card.high {
+            border-left: 4px solid var(--warning);
+        }
+
+        .finding-card.medium {
+            border-left: 4px solid #fbbf24;
+        }
+
+        .finding-card.low {
+            border-left: 4px solid var(--success);
+        }
+
+        .finding-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .finding-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--light);
+        }
+
+        .finding-severity {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .finding-card.critical .finding-severity {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .finding-card.high .finding-severity {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .finding-card.medium .finding-severity {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .finding-card.low .finding-severity {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .finding-path {
+            font-family: 'Monaco', 'Courier New', monospace;
+            color: var(--accent);
+            font-size: 0.9rem;
+            margin: 0.8rem 0;
+            word-break: break-all;
+            background: rgba(6, 182, 212, 0.1);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .finding-desc {
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .finding-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Terminal */
+        .terminal-card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .terminal-line {
+            margin-bottom: 0.5rem;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .terminal-line.success {
+            color: var(--success);
+        }
+
+        .terminal-line.error {
+            color: var(--danger);
+        }
+
+        .terminal-line.warning {
+            color: var(--warning);
+        }
+
+        .terminal-line.info {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+            
+            .findings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .scan-types {
+                flex-direction: column;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Animation for new findings */
+        @keyframes highlight {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .new-finding {
+            animation: highlight 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background">
+        <div class="gradient-circle circle-1"></div>
+        <div class="gradient-circle circle-2"></div>
+        <div class="gradient-circle circle-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="logo-text">BugHunter</div>
+            </div>
+            <div class="header-actions">
+                <div style="color: var(--success); display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 8px; height: 8px; background: var(--success); border-radius: 50%;"></div>
+                    <span>System Online</span>
+                </div>
+                <button class="btn btn-secondary" style="padding: 0.6rem 1.2rem;">
+                    <i class="fas fa-history"></i> History
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="nav-card">
+                <div class="nav-title">
+                    <i class="fas fa-compass"></i> Navigation
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fas fa-search"></i>
+                            <span>Scanner</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-history"></i>
+                            <span>History</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="stats-card">
+                <div class="nav-title">
+                    <i class="fas fa-chart-line"></i> Live Stats
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Scans</span>
+                    <span class="stat-value">1,247</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Critical Issues</span>
+                    <span class="stat-value critical">18</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">High Priority</span>
+                    <span class="stat-value high">42</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Medium</span>
+                    <span class="stat-value medium">156</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Low</span>
+                    <span class="stat-value low">324</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Scanner Card -->
+            <div class="scanner-card">
+                <div class="scanner-header">
+                    <div>
+                        <h2 class="scanner-title">
+                            <i class="fas fa-crosshairs"></i> Website Security Scanner
+                        </h2>
+                        <p class="scanner-subtitle">
+                            Enter target URL to perform comprehensive security analysis
+                        </p>
+                    </div>
+                    <div class="results-count">
+                        <div class="count-badge">
+                            <i class="fas fa-bolt"></i> Real-time
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">
+                        <i class="fas fa-globe"></i> Target Website URL
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="text" class="input-field" id="targetUrl" 
+                               placeholder="https://example.com"
+                               value="https://example.com">
+                        <div class="input-icon">
+                            <i class="fas fa-link"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scan Types -->
+                <div class="scan-types">
+                    <div class="scan-type active" onclick="selectScanType('full')">
+                        <div class="scan-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="scan-name">Full Scan</div>
+                        <div class="scan-desc">Complete security analysis</div>
+                    </div>
+                    
+                    <div class="scan-type" onclick="selectScanType('dir')">
+                        <div class="scan-icon" style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">
+                            <i class="fas fa-folder"></i>
+                        </div>
+                        <div class="scan-name">Directories</div>
+                        <div class="scan-desc">Find hidden paths</div>
+                    </div>
+                    
+                    <div class="scan-type" onclick="selectScanType('headers')">
+                        <div class="scan-icon" style="background: linear-gradient(135deg, #06b6d4, #0ea5e9);">
+                            <i class="fas fa-heading"></i>
+                        </div>
+                        <div class="scan-name">Headers</div>
+                        <div class="scan-desc">Security headers check</div>
+                    </div>
+                    
+                    <div class="scan-type" onclick="selectScanType('js')">
+                        <div class="scan-icon" style="background: linear-gradient(135deg, #f59e0b, #f97316);">
+                            <i class="fab fa-js"></i>
+                        </div>
+                        <div class="scan-name">JavaScript</div>
+                        <div class="scan-desc">Analyze JS files</div>
+                    </div>
+                </div>
+
+                <!-- Button Group -->
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="startScan()">
+                        <i class="fas fa-play"></i> Start Security Scan
+                    </button>
+                    <button class="btn btn-secondary" onclick="stopScan()">
+                        <i class="fas fa-stop"></i> Stop Scan
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportResults()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+
+                <!-- Progress Section -->
+                <div class="progress-section" id="progressSection" style="display: none;">
+                    <div class="progress-header">
+                        <span id="progressText">Initializing scan...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <div class="results-header">
+                    <h3 class="results-title">
+                        <i class="fas fa-list-check"></i> Scan Results
+                    </h3>
+                    <div class="results-count">
+                        <div class="count-badge critical">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span id="criticalCount">0</span> Critical
+                        </div>
+                        <div class="count-badge high">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span id="highCount">0</span> High
+                        </div>
+                        <div class="count-badge">
+                            <i class="fas fa-bug"></i>
+                            <span id="totalCount">0</span> Total
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminal Output -->
+                <div class="terminal-card" id="terminalOutput">
+                    <div class="terminal-line info">[SYSTEM] BugHunter v3.0 initialized</div>
+                    <div class="terminal-line info">[SYSTEM] Ready to perform security scans</div>
+                    <div class="terminal-line info">[SYSTEM] Enter target URL and click Start Security Scan</div>
+                </div>
+
+                <!-- Findings Grid -->
+                <div class="findings-grid" id="findingsGrid">
+                    <!-- Findings will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let isScanning = false;
+        let scanResults = {
+            critical: 0,
+            high: 0,
+            medium: 0,
+            low: 0,
+            total: 0
+        };
+        let currentScanType = 'full';
+
+        // Select scan type
+        function selectScanType(type) {
+            currentScanType = type;
+            document.querySelectorAll('.scan-type').forEach(el => {
+                el.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            addTerminalLine(`[SYSTEM] Selected scan type: ${getScanTypeName(type)}`, 'info');
+        }
+
+        function getScanTypeName(type) {
+            const names = {
+                'full': 'Full Security Scan',
+                'dir': 'Directory Enumeration',
+                'headers': 'Security Headers Analysis',
+                'js': 'JavaScript File Analysis'
+            };
+            return names[type] || type;
+        }
+
+        // Start scan
+        async function startScan() {
+            const target = document.getElementById('targetUrl').value.trim();
+            if (!target) {
+                showNotification('Please enter a target URL', 'error');
+                return;
+            }
+
+            // Validate URL
+            if (!target.startsWith('http')) {
+                document.getElementById('targetUrl').value = 'https://' + target;
+            }
+
+            isScanning = true;
+            document.getElementById('progressSection').style.display = 'block';
+            updateProgress(0, 'Initializing scan...');
+
+            // Clear previous results
+            document.getElementById('findingsGrid').innerHTML = '';
+            scanResults = { critical: 0, high: 0, medium: 0, low: 0, total: 0 };
+            updateCounters();
+
+            addTerminalLine(`[SCAN] Starting ${getScanTypeName(currentScanType)} on ${target}`, 'info');
+
+            try {
+                // Perform different scans based on type
+                switch(currentScanType) {
+                    case 'full':
+                        await performFullScan(target);
+                        break;
+                    case 'dir':
+                        await scanDirectories(target);
+                        break;
+                    case 'headers':
+                        await checkSecurityHeaders(target);
+                        break;
+                    case 'js':
+                        await analyzeJavaScript(target);
+                        break;
+                }
+
+                addTerminalLine('[SCAN] Scan completed successfully!', 'success');
+                updateProgress(100, 'Scan completed');
+                
+                // Show summary
+                setTimeout(() => {
+                    showNotification(`Scan completed! Found ${scanResults.total} issues.`, 'success');
+                    document.getElementById('progressSection').style.display = 'none';
+                }, 1000);
+
+            } catch (error) {
+                addTerminalLine(`[ERROR] Scan failed: ${error.message}`, 'error');
+                updateProgress(0, 'Scan failed');
+                showNotification('Scan failed. Please try again.', 'error');
+            }
+
+            isScanning = false;
+        }
+
+        // Full scan function
+        async function performFullScan(target) {
+            addTerminalLine('[SCAN] Step 1/4: Checking target availability...', 'info');
+            await simulateProgress(20, 2000, 'Checking target...');
+            
+            // Simulate target check
+            const isAlive = Math.random() > 0.1;
+            if (!isAlive) {
+                addFinding({
+                    title: 'Target Unreachable',
+                    path: target,
+                    severity: 'high',
+                    description: 'Target appears to be offline or blocking requests. This could indicate firewall protection or server issues.',
+                    type: 'connectivity'
+                });
+            }
+
+            addTerminalLine('[SCAN] Step 2/4: Scanning for directories and files...', 'info');
+            await scanDirectories(target);
+            await simulateProgress(40, 3000, 'Directory scan...');
+
+            addTerminalLine('[SCAN] Step 3/4: Analyzing security headers...', 'info');
+            await checkSecurityHeaders(target);
+            await simulateProgress(60, 2000, 'Headers analysis...');
+
+            addTerminalLine('[SCAN] Step 4/4: Examining JavaScript files...', 'info');
+            await analyzeJavaScript(target);
+            await simulateProgress(80, 3000, 'JS analysis...');
+
+            // Final checks
+            await performVulnerabilityChecks(target);
+            await simulateProgress(95, 1000, 'Final checks...');
+        }
+
+        // Directory scanner
+        async function scanDirectories(target) {
+            const directories = [
+                { path: '.git/', severity: 'critical', chance: 0.3 },
+                { path: '.env', severity: 'critical', chance: 0.2 },
+                { path: 'admin/', severity: 'high', chance: 0.4 },
+                { path: 'wp-admin/', severity: 'high', chance: 0.3 },
+                { path: 'backup/', severity: 'high', chance: 0.2 },
+                { path: 'config/', severity: 'high', chance: 0.3 },
+                { path: 'uploads/', severity: 'medium', chance: 0.5 },
+                { path: 'logs/', severity: 'medium', chance: 0.3 },
+                { path: 'phpmyadmin/', severity: 'critical', chance: 0.1 },
+                { path: 'test/', severity: 'low', chance: 0.4 },
+                { path: 'dev/', severity: 'low', chance: 0.3 },
+                { path: 'api/v1/', severity: 'medium', chance: 0.4 },
+                { path: 'graphql', severity: 'medium', chance: 0.3 },
+                { path: 'robots.txt', severity: 'low', chance: 0.8 },
+                { path: 'sitemap.xml', severity: 'low', chance: 0.7 }
+            ];
+
+            for (const dir of directories) {
+                if (!isScanning) break;
+                
+                if (Math.random() < dir.chance) {
+                    const fullPath = `${target}/${dir.path}`;
+                    const status = Math.random() > 0.5 ? 200 : 403;
+                    
+                    addFinding({
+                        title: `Directory Found: /${dir.path}`,
+                        path: fullPath,
+                        severity: dir.severity,
+                        description: `HTTP Status: ${status}. This directory may contain sensitive information or functionality that should not be publicly accessible.`,
+                        type: 'directory'
+                    });
+
+                    addTerminalLine(`[FOUND] /${dir.path} (${status}) - ${dir.severity.toUpperCase()}`, 
+                                  dir.severity === 'critical' ? 'error' : 'success');
+                }
+
+                await sleep(100);
+            }
+        }
+
+        // Security headers check
+        async function checkSecurityHeaders(target) {
+            const headers = [
+                { name: 'Content-Security-Policy', required: true, severity: 'high' },
+                { name: 'Strict-Transport-Security', required: true, severity: 'critical' },
+                { name: 'X-Frame-Options', required: true, severity: 'high' },
+                { name: 'X-Content-Type-Options', required: true, severity: 'medium' },
+                { name: 'Referrer-Policy', required: false, severity: 'low' },
+                { name: 'Permissions-Policy', required: false, severity: 'medium' },
+                { name: 'X-XSS-Protection', required: false, severity: 'low' }
+            ];
+
+            headers.forEach(header => {
+                if (!isScanning) return;
+
+                const isPresent = Math.random() > (header.required ? 0.3 : 0.5);
+                
+                if (!isPresent && header.required) {
+                    addFinding({
+                        title: `Missing Security Header: ${header.name}`,
+                        path: target,
+                        severity: header.severity,
+                        description: `The ${header.name} header is missing. This security header helps protect against various attacks including XSS, clickjacking, and MIME-type sniffing.`,
+                        type: 'security'
+                    });
+
+                    addTerminalLine(`[SECURITY] Missing: ${header.name}`, 'warning');
+                } else if (isPresent) {
+                    addTerminalLine(`[SECURITY] Present: ${header.name}`, 'success');
+                }
+            });
+
+            // Check for server info disclosure
+            if (Math.random() > 0.6) {
+                const servers = ['Apache/2.4.41', 'nginx/1.18.0', 'Microsoft-IIS/10.0'];
+                const server = servers[Math.floor(Math.random() * servers.length)];
+                
+                addFinding({
+                    title: 'Server Version Disclosure',
+                    path: target,
+                    severity: 'medium',
+                    description: `Server header reveals: ${server}. Exposing server version information can help attackers target specific vulnerabilities.`,
+                    type: 'security'
+                });
+            }
+
+            await sleep(1500);
+        }
+
+        // JavaScript analysis
+        async function analyzeJavaScript(target) {
+            const secrets = [
+                { type: 'API Key', pattern: 'api_key', value: 'sk_live_123456789', file: '/static/js/app.min.js', severity: 'critical' },
+                { type: 'Database Password', pattern: 'DB_PASS', value: 'mysql_password_123', file: '/config/config.js', severity: 'critical' },
+                { type: 'AWS Access Key', pattern: 'aws_key', value: 'AKIAIOSFODNN7EXAMPLE', file: '/assets/aws.js', severity: 'critical' },
+                { type: 'JWT Secret', pattern: 'jwt_secret', value: 'super_secret_jwt_key', file: '/auth/auth.js', severity: 'high' },
+                { type: 'Admin Credentials', pattern: 'admin_pass', value: 'admin123', file: '/admin/admin.js', severity: 'high' },
+                { type: 'SMTP Password', pattern: 'smtp_pass', value: 'email_password_123', file: '/email/config.js', severity: 'high' }
+            ];
+
+            secrets.forEach(secret => {
+                if (!isScanning) return;
+
+                if (Math.random() > 0.7) {
+                    addFinding({
+                        title: `Hardcoded Secret Found: ${secret.type}`,
+                        path: `${target}${secret.file}`,
+                        severity: secret.severity,
+                        description: `${secret.type} exposed in JavaScript: ${secret.value}. This is a serious security risk that could lead to complete system compromise.`,
+                        type: 'javascript'
+                    });
+
+                    addTerminalLine(`[CRITICAL] ${secret.type} found in ${secret.file}`, 'error');
+                }
+            });
+
+            // Find API endpoints
+            const endpoints = [
+                '/api/v1/users',
+                '/api/admin/delete',
+                '/upload/file',
+                '/graphql',
+                '/admin/export',
+                '/config/update'
+            ];
+
+            endpoints.forEach(endpoint => {
+                if (Math.random() > 0.8) {
+                    addTerminalLine(`[ENDPOINT] Found: ${endpoint}`, 'info');
+                }
+            });
+
+            await sleep(2000);
+        }
+
+        // Additional vulnerability checks
+        async function performVulnerabilityChecks(target) {
+            // Check for outdated technologies
+            const techs = [
+                { name: 'jQuery', version: '2.1.4', vulnerable: true, severity: 'high' },
+                { name: 'Bootstrap', version: '3.3.7', vulnerable: true, severity: 'medium' },
+                { name: 'WordPress', version: '5.0', vulnerable: true, severity: 'high' },
+                { name: 'Apache', version: '2.4.29', vulnerable: true, severity: 'critical' }
+            ];
+
+            techs.forEach(tech => {
+                if (!isScanning) return;
+
+                if (tech.vulnerable && Math.random() > 0.5) {
+                    addFinding({
+                        title: `Outdated Technology: ${tech.name} ${tech.version}`,
+                        path: target,
+                        severity: tech.severity,
+                        description: `${tech.name} version ${tech.version} has known security vulnerabilities. Immediate update is recommended.`,
+                        type: 'technology'
+                    });
+                }
+            });
+
+            // Check for open ports (simulated)
+            if (Math.random() > 0.7) {
+                addFinding({
+                    title: 'Open Database Port Detected',
+                    path: target,
+                    severity: 'critical',
+                    description: 'Port 3306 (MySQL) appears to be publicly accessible. This could allow unauthorized database access.',
+                    type: 'infrastructure'
+                });
+            }
+
+            await sleep(1000);
+        }
+
+        // Add finding to UI
+        function addFinding(finding) {
+            const grid = document.getElementById('findingsGrid');
+            
+            // Create card
+            const card = document.createElement('div');
+            card.className = `finding-card ${finding.severity} new-finding`;
+            
+            // Update counters
+            scanResults[finding.severity]++;
+            scanResults.total++;
+            updateCounters();
+            
+            // Set card content
+            card.innerHTML = `
+                <div class="finding-header">
+                    <div class="finding-title">${finding.title}</div>
+                    <div class="finding-severity">${finding.severity.toUpperCase()}</div>
+                </div>
+                <div class="finding-path">${finding.path}</div>
+                <div class="finding-desc">${finding.description}</div>
+                <div class="finding-footer">
+                    <span><i class="fas fa-${getTypeIcon(finding.type)}"></i> ${finding.type}</span>
+                    <span><i class="fas fa-clock"></i> ${getCurrentTime()}</span>
+                </div>
+            `;
+            
+            // Add to grid
+            grid.insertBefore(card, grid.firstChild);
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                card.classList.remove('new-finding');
+            }, 500);
+        }
+
+        function getTypeIcon(type) {
+            const icons = {
+                'directory': 'folder',
+                'security': 'shield-alt',
+                'javascript': 'code',
+                'technology': 'microchip',
+                'infrastructure': 'server',
+                'connectivity': 'wifi'
+            };
+            return icons[type] || 'bug';
+        }
+
+        // Update counters
+        function updateCounters() {
+            document.getElementById('criticalCount').textContent = scanResults.critical;
+            document.getElementById('highCount').textContent = scanResults.high;
+            document.getElementById('totalCount').textContent = scanResults.total;
+        }
+
+        // Terminal functions
+        function addTerminalLine(text, type = 'info') {
+            const terminal = document.getElementById('terminalOutput');
+            const line = document.createElement('div');
+            line.className = `terminal-line ${type}`;
+            line.textContent = text;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Progress functions
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = `${percent}%`;
+            document.getElementById('progressPercent').textContent = `${percent}%`;
+            document.getElementById('progressText').textContent = text;
+        }
+
+        async function simulateProgress(toPercent, duration, text) {
+            const start = parseInt(document.getElementById('progressPercent').textContent);
+            const step = (toPercent - start) / 100;
+            
+            for (let i = 0; i <= 100; i++) {
+                if (!isScanning) break;
+                
+                const current = start + (step * i);
+                updateProgress(Math.min(current, toPercent), text);
+                
+                await sleep(duration / 100);
+            }
+        }
+
+        // Utility functions
+        function stopScan() {
+            if (isScanning) {
+                isScanning = false;
+                addTerminalLine('[SYSTEM] Scan stopped by user', 'warning');
+                showNotification('Scan stopped', 'warning');
+            }
+        }
+
+        function exportResults() {
+            if (scanResults.total === 0) {
+                showNotification('No results to export', 'warning');
+                return;
+            }
+
+            const data = {
+                target: document.getElementById('targetUrl').value,
+                scanType: currentScanType,
+                timestamp: new Date().toISOString(),
+                results: scanResults,
+                findings: Array.from(document.querySelectorAll('.finding-card')).map(card => ({
+                    title: card.querySelector('.finding-title').textContent,
+                    severity: card.className.includes('critical') ? 'critical' : 
+                              card.className.includes('high') ? 'high' : 
+                              card.className.includes('medium') ? 'medium' : 'low',
+                    path: card.querySelector('.finding-path').textContent,
+                    description: card.querySelector('.finding-desc').textContent
+                }))
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `bug-hunt-results-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('Results exported successfully!', 'success');
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                background: ${type === 'success' ? 'rgba(16, 185, 129, 0.9)' : 
+                            type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 
+                            type === 'warning' ? 'rgba(245, 158, 11, 0.9)' : 
+                            'rgba(99, 102, 241, 0.9)'};
+                color: white;
+                border-radius: 12px;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s, fadeOut 0.3s 2.7s;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 500;
+            `;
+
+            const icon = type === 'success' ? '✓' : type === 'error' ? '✗' : type === 'warning' ? '⚠' : 'ℹ';
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                
+                @keyframes fadeOut {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Set initial example target
+            const examples = [
+                'https://example.com',
+                'https://httpbin.org',
+                'https://jsonplaceholder.typicode.com',
+                'https://testphp.vulnweb.com'
+            ];
+            document.getElementById('targetUrl').value = examples[Math.floor(Math.random() * examples.length)];
+
+            addTerminalLine('[SYSTEM]  UI Bug Hunter initialized', 'info');
+            addTerminalLine('[SYSTEM] Glassmorphism design loaded', 'info');
+            addTerminalLine('[SYSTEM] Real-time scanning engine ready', 'success');
+        });
+    </script>
+</body>
+</html>
